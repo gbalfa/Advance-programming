@@ -3,11 +3,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 /* Doubly linked list polynomial with head and tail */
 struct Polynomial {
   struct Node *head;
   struct Node *tail;
+  int degree;
 };
 
 /* A node of the doubly linked list polynomial */
@@ -57,27 +59,45 @@ void push(struct Polynomial *poly, double new_coeff, int new_exp) {
 /**
  *  \brief Generates the polynomial.
  *
- *  Constructs the polynomial pushing the nodes into the doublylinked list,
- *  pushing at last the degree of the polinomial.
+ *  Generates a random polynomial pushing (n+1) nodes into a doublylinkedlist.
  *
  *  \param n: Polynomial degree.
- *  \return return type
  */
-//////////
+struct Polynomial *generatePolynomial(int n) {
+  /* Intializes polynomial */
+  struct Polynomial *new_polynomial =
+      (struct Polynomial *)malloc(sizeof(struct Polynomial));
+  new_polynomial->head = NULL;
+  new_polynomial->tail = NULL;
+  new_polynomial->degree = n;
+
+  int i;
+  double a = 10.0; /* --> range of rand generation [0,a] */
+  time_t t;
+
+  /* Intializes random number generator */
+  srand((unsigned)time(&t));
+
+  /* Generates the polynomial */
+  for (i = new_polynomial->degree; i >= 0; --i)
+    push(new_polynomial, (((double)rand() / (double)(RAND_MAX)) * a), i);
+
+  return new_polynomial;
+}
 
 /**
  *  \brief Frees the polynomial memory.
  *
- *  \param List's head.
+ *  \param Polynomial struct.
  */
-void freeList(struct Polynomial *poly) {
+void freeList(struct Polynomial *polynomial) {
   struct Node *tmp;
-  while (poly->head != NULL) {
-    tmp = poly->head;
-    poly->head = poly->head->next;
+  while (polynomial->head != NULL) {
+    tmp = polynomial->head;
+    polynomial->head = polynomial->head->next;
     free(tmp);
   }
-  free(poly);
+  free(polynomial);
 }
 
 /**
