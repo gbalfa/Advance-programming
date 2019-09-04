@@ -1,8 +1,8 @@
 /* Laboratory 1 Advance Programming */
 /* Authors: Gabriel Badilla & Rodrigo Kobayashi */
 /* Compiler: gcc */
-#include "doublyLinkedList.h"
-#include "basicArithmetics.h"
+#include "doublyLinkedListPolynomial.h"
+#include "basicPolynomialArithmetics.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
