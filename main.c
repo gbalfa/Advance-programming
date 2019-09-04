@@ -8,8 +8,8 @@
 #include <time.h>
 
 int main() {
-  struct doublyLinkedList *polynomial =
-      (struct doublyLinkedList *)malloc(sizeof(struct doublyLinkedList));
+  struct Polynomial *polynomial =
+      (struct Polynomial *)malloc(sizeof(struct Polynomial));
   polynomial->head = NULL;
   polynomial->tail = NULL;
 
@@ -28,7 +28,7 @@ int main() {
     push(polynomial, (((double)rand() / (double)(RAND_MAX)) * a), i);
 
   printPolynomial(polynomial->head);
-  struct doublyLinkedList *copyPoly = copyPolynomial(*polynomial);
+  struct Polynomial *copyPoly = copyPolynomial(*polynomial);
   printPolynomial(copyPoly->head);
   freeList(polynomial);
   freeList(copyPoly);
