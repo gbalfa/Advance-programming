@@ -1,7 +1,11 @@
+#ifndef BASICPOLYNOMIALARITHMETICS_H
+#define BASICPOLYNOMIALARITHMETICS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
-/* #include "doublyLinkedList.h" */
+#include "doublyLinkedListPolynomial.h"
+
 
 struct doublyLinkedList* copyPolynomial(struct doublyLinkedList list) {
 
@@ -18,3 +22,5 @@ struct doublyLinkedList* copyPolynomial(struct doublyLinkedList list) {
   }
   return new_list;
 }
+
+#endif /* BASICPOLYNOMIALARITHMETICS_H */

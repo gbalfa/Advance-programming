@@ -1,3 +1,6 @@
+#ifndef DOUBLYLINKEDLISTPOLYNOMIAL_H
+#define DOUBLYLINKEDLISTPOLYNOMIAL_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -72,3 +75,5 @@ void printPolynomial(struct Node *node) {
   printf("\n");
   return;
 }
+
+#endif /* DOUBLYLINKEDLISTPOLYNOMIAL_H */
