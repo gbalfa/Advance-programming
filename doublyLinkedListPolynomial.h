@@ -21,12 +21,14 @@ struct Node {
 };
 
 /**
- *  \brief Push a node into a polynomial.
+ *  Push a node into a polynomial.
  *
  *  Function to insert a polynomial node at the beginning of the Doubly Linked
  *  List.
  *
- *  \param Polinomial struct, monomial coefficient, monomial exponent.
+ *  @poly Polinomial struct.
+ *  @new_coeff Monomial coefficient.
+ *  @new_exp Monomial exponent.
  */
 void push(struct Polynomial *poly, double new_coeff, int new_exp) {
   /* allocate node */

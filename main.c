@@ -9,15 +9,19 @@
 
 int main() {
   int n;
-
   printf("Enter the degree of the polynomial to generate: ");
   scanf("%d", &n);
 
   struct Polynomial *polynomial = generatePolynomial(n);
   printPolynomial(polynomial->head);
-
-  struct Polynomial *copyPoly = copyPolynomial(*polynomial);
+  struct Polynomial *copyPoly = copyPolynomial(polynomial);
   printPolynomial(copyPoly->head);
+
+  /* struct Polynomial* sum = addPolynomials(polynomial, copyPoly); */
+  /* printPolynomial(sum->head); */
+
+  struct Polynomial* substract = substractPolynomials(polynomial, copyPoly);
+  printPolynomial(substract->head);
 
   freeList(polynomial);
   freeList(copyPoly);
