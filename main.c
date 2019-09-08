@@ -28,9 +28,9 @@ int main() {
   struct Polynomial *sum = addPolynomials(polynomial, copy2Poly);
   printPolynomial(sum->head);
 
-  freeList(polynomial);
-  freeList(copyPoly);
-  freeList(copy2Poly);
+  freePolynomial(polynomial);
+  freePolynomial(copyPoly);
+  freePolynomial(copy2Poly);
 
   return 0;
 }

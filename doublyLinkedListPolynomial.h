@@ -92,7 +92,7 @@ struct Polynomial *generatePolynomial(int n) {
  *
  *  \param Polynomial struct.
  */
-void freeList(struct Polynomial *polynomial) {
+void freePolynomial(struct Polynomial *polynomial) {
   struct Node *tmp;
   while (polynomial->head != NULL) {
     tmp = polynomial->head;
