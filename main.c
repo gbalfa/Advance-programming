@@ -17,20 +17,22 @@ int main() {
   struct Polynomial *copyPoly = copyPolynomial(polynomial);
   printf("\nPolynomial copy:\n");
   printPolynomial(copyPoly->head);
-  // Second copy.
-  struct Polynomial *copy2Poly = copyPolynomial(polynomial);
+
+  printf("\nSubstrahend:\n");
+  struct Polynomial *subtrahend = generatePolynomial(10);
+  printPolynomial(subtrahend->head);
 
   printf("\nPolynomial subtraction:\n");
-  struct Polynomial *subtract = subtractPolynomials(polynomial, copyPoly);
-  printPolynomial(subtract->head);
+  struct Polynomial *difference = subtractPolynomials(polynomial, subtrahend);
+  printPolynomial(difference->head);
 
   printf("\nPolynomial sum:\n");
-  struct Polynomial *sum = addPolynomials(polynomial, copy2Poly);
+  struct Polynomial *sum = addPolynomials(polynomial, copyPoly);
   printPolynomial(sum->head);
 
   freePolynomial(polynomial);
   freePolynomial(copyPoly);
-  freePolynomial(copy2Poly);
+  freePolynomial(subtrahend);
 
   return 0;
 }
