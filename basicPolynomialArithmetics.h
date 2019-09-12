@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "doublyLinkedListPolynomial.h"
+#include "polynomialsLinkedList.h"
 
 /**
  *  \brief Clones a Polynomial.
@@ -99,6 +100,74 @@ struct Polynomial *subtractPolynomials(struct Polynomial *poly1,
     }
   }
   return greatest_poly;
+}
+
+/**
+ *  \brief Brute Force Polynomials product.
+ *
+ *  Multiplies two polynomials.
+ *
+ *  \param poly1 Polynomial
+ *  \param poly2 Polynomial
+ *  \return product Polynomial
+ */
+struct Polynomial *multiplyPolynomials(struct Polynomial *poly1,
+                                       struct Polynomial *poly2) {
+  struct Node *node_poly1 = poly1->tail;
+  struct Node *node_poly2 = poly2->tail;
+
+  struct PolynomialsLinkedListNode *list = NULL;
+
+  /* each monomial of poly1 multiplicated by every poly2 monomial */
+  int i = poly1->degree;
+  while (node_poly1 != NULL) {
+    struct Polynomial *new_poly =
+        (struct Polynomial *)malloc(sizeof(struct Polynomial));
+    new_poly->head = NULL;
+    new_poly->tail = NULL;
+    new_poly->degree = poly2->degree + i;
+    node_poly2 = poly2->tail;
+    int j = new_poly->degree; /* exponents */
+    while (node_poly2 != NULL) {
+      push(new_poly, node_poly1->coeff * node_poly2->coeff, j);
+      node_poly2 = node_poly2->prev;
+      --j;
+    }
+    push2(&list, new_poly);
+    node_poly1 = node_poly1->prev;
+    --i;
+  }
+  /* Create result polynomial */
+  struct Polynomial *result =
+      (struct Polynomial *)malloc(sizeof(struct Polynomial));
+  result->head = NULL;
+  result->tail = NULL;
+  result->degree = poly1->degree + poly2->degree;
+  int exponent = result->degree;
+  for (int i = result->degree; i >= 0; --i) {
+    push(result, 0, exponent);
+    --exponent;
+  }
+  /* Add Polynomials */
+  struct Node *node_result = result->head;
+  struct Node *node_poly;
+  struct PolynomialsLinkedListNode *tmp_list = list;
+  while (tmp_list != NULL) {
+    node_result = result->head;
+    node_poly = tmp_list->poly->head;
+    for (int i = tmp_list->poly->head->exp; i > 0; --i) {
+      node_result = node_result->next;
+    }
+    struct Node *tmp_node_result = node_result;
+    while (node_poly != NULL) {
+      tmp_node_result->coeff += node_poly->coeff;
+      tmp_node_result = tmp_node_result->next;
+      node_poly = node_poly->next;
+    }
+    tmp_list = tmp_list->next;
+  }
+  freePolynomialsList(list);
+  return result;
 }
 
 #endif /* BASICPOLYNOMIALARITHMETICS_H */

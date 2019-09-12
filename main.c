@@ -18,12 +18,16 @@ int main() {
   printf("\nPolynomial copy:\n");
   printPolynomial(copyPoly->head);
 
+  printf("\nPolynomial product:\n");
+  struct Polynomial *product = multiplyPolynomials(polynomial, copyPoly);
+  printPolynomial(product->head);
+
   printf("\nSubstrahend:\n");
-  struct Polynomial *subtrahend = generatePolynomial(10);
+  struct Polynomial *subtrahend = generatePolynomial(n);
   printPolynomial(subtrahend->head);
 
   printf("\nPolynomial subtraction:\n");
-  struct Polynomial *difference = subtractPolynomials(polynomial, subtrahend);
+  struct Polynomial *difference = subtractPolynomials(subtrahend, polynomial);
   printPolynomial(difference->head);
 
   printf("\nPolynomial sum:\n");
@@ -33,6 +37,7 @@ int main() {
   freePolynomial(polynomial);
   freePolynomial(copyPoly);
   freePolynomial(subtrahend);
+  freePolynomial(product);
 
   return 0;
 }

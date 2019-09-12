@@ -114,7 +114,7 @@ void printPolynomial(struct Node *node) {
     return;
 
   /* first node */
-  printf("%f", node->coeff);
+  printf("%f*X^%d", node->coeff, node->exp);
   node = node->next;
 
   /* the rest of the nodes */
