@@ -22,6 +22,10 @@ int main() {
   struct Polynomial *product = multiplyPolynomials(polynomial, copyPoly);
   printPolynomial(product->head);
 
+  printf("\nPolynomial product:\n");
+  struct Polynomial *productDecrease = decreaseAndConquer(polynomial, copyPoly);
+  printPolynomial(productDecrease->head);
+
   printf("\nSubstrahend:\n");
   struct Polynomial *subtrahend = generatePolynomial(n);
   printPolynomial(subtrahend->head);

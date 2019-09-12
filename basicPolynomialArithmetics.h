@@ -169,5 +169,32 @@ struct Polynomial *multiplyPolynomials(struct Polynomial *poly1,
   freePolynomialsList(list);
   return result;
 }
+struct Polynomial *decreaseAndConquer(struct Polynomial *Poly1, struct Polynomial *Poly2){
+  struct Polynomial *Result;
+  Result = (struct Polynomial*)malloc(sizeof(struct Polynomial));
+  Result->head = NULL;
+  Result->tail = NULL;
+  Result->degree = Poly1->degree + Poly2->degree;
+  for (int i=Result->degree ;i>=0 ;--i){
+    push(Result, 0, i);
+  }
+  struct Node *Factor1 = Poly1->tail;
+  struct Node *Factor2 = Poly2->tail;
+  struct Node *Position = Result->tail;
+  struct Node *Temp = Result->tail;
+  while(Factor1 != NULL){
+      Position = Temp;
+      Factor2 = Poly2->tail;
+    while(Factor2 != NULL){
+      Position->coeff +=  Factor1->coeff * Factor2->coeff;
+      Position = Position->prev;
+      Factor2 = Factor2->prev;
+    }
+    Factor1 = Factor1->prev;
+    Temp = Temp->prev;
+  }
+  return Result;
+}
+
 
 #endif /* BASICPOLYNOMIALARITHMETICS_H */
