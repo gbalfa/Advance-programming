@@ -14,15 +14,16 @@ int main() {
   struct Polynomial *polynomial = generatePolynomial(n);
   printf("Generated polynomial:\n");
   printPolynomial(polynomial->head);
+
   struct Polynomial *copyPoly = copyPolynomial(polynomial);
   printf("\nPolynomial copy:\n");
   printPolynomial(copyPoly->head);
 
-  printf("\nPolynomial product:\n");
+  printf("\nPolynomial product Brute force:\n");
   struct Polynomial *product = multiplyPolynomials(polynomial, copyPoly);
   printPolynomial(product->head);
 
-  printf("\nPolynomial product:\n");
+  printf("\nPolynomial product Decrease and conquer:\n");
   struct Polynomial *productDecrease = decreaseAndConquer(polynomial, copyPoly);
   printPolynomial(productDecrease->head);
 
@@ -42,6 +43,7 @@ int main() {
   freePolynomial(copyPoly);
   freePolynomial(subtrahend);
   freePolynomial(product);
+  freePolynomial(productDecrease);
 
   return 0;
 }

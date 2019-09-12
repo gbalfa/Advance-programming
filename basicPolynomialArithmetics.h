@@ -169,32 +169,42 @@ struct Polynomial *multiplyPolynomials(struct Polynomial *poly1,
   freePolynomialsList(list);
   return result;
 }
-struct Polynomial *decreaseAndConquer(struct Polynomial *Poly1, struct Polynomial *Poly2){
-  struct Polynomial *Result;
-  Result = (struct Polynomial*)malloc(sizeof(struct Polynomial));
-  Result->head = NULL;
-  Result->tail = NULL;
-  Result->degree = Poly1->degree + Poly2->degree;
-  for (int i=Result->degree ;i>=0 ;--i){
-    push(Result, 0, i);
+
+/**
+ *  \brief DecreaseAndConquer Polynomials product.
+ *
+ *  Multiplies two polynomials using the Decrease and Conquer strategy.
+ *
+ *  \param poly1 Polynomial
+ *  \param poly2 Polynomial
+ *  \return product Polynomial
+ */
+struct Polynomial *decreaseAndConquer(struct Polynomial *poly1,
+                                      struct Polynomial *poly2) {
+  struct Polynomial *result;
+  result = (struct Polynomial *)malloc(sizeof(struct Polynomial));
+  result->head = NULL;
+  result->tail = NULL;
+  result->degree = poly1->degree + poly2->degree;
+  for (int i = result->degree; i >= 0; --i) {
+    push(result, 0, i);
   }
-  struct Node *Factor1 = Poly1->tail;
-  struct Node *Factor2 = Poly2->tail;
-  struct Node *Position = Result->tail;
-  struct Node *Temp = Result->tail;
-  while(Factor1 != NULL){
-      Position = Temp;
-      Factor2 = Poly2->tail;
-    while(Factor2 != NULL){
-      Position->coeff +=  Factor1->coeff * Factor2->coeff;
-      Position = Position->prev;
-      Factor2 = Factor2->prev;
+  struct Node *factor1 = poly1->tail;
+  struct Node *factor2 = poly2->tail;
+  struct Node *position = result->tail;
+  struct Node *Temp = result->tail;
+  while (factor1 != NULL) {
+    position = Temp;
+    factor2 = poly2->tail;
+    while (factor2 != NULL) {
+      position->coeff += factor1->coeff * factor2->coeff;
+      position = position->prev;
+      factor2 = factor2->prev;
     }
-    Factor1 = Factor1->prev;
+    factor1 = factor1->prev;
     Temp = Temp->prev;
   }
-  return Result;
+  return result;
 }
-
 
 #endif /* BASICPOLYNOMIALARITHMETICS_H */
