@@ -65,7 +65,7 @@ struct Polynomial *addPolynomials(struct Polynomial *poly1,
  *  \brief Substract two polynomials.
  *
  *  Compares the degrees of the polinomials and overwrite the coefficients of
- *  the greatest one with the difference poly1 - poly2.
+ *  the greatest one with the poly1 - poly2 difference.
  *
  *  \param Polynomials.
  *  \return A polynomial with the Sum of the polynomials.

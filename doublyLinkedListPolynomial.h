@@ -109,8 +109,10 @@ void freePolynomial(struct Polynomial *polynomial) {
  *
  *  \param List's head.
  */
-void printPolynomial(struct Node *node) {
-  if (node == NULL)
+void printPolynomial(struct Polynomial *poly) {
+  struct Node *node = poly->head;
+
+  if (node == NULL || poly->degree > 10)
     return;
 
   /* first node */
