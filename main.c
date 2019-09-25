@@ -5,6 +5,8 @@
 #include "doublyLinkedListPolynomial.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include "plot.h"
 
 int main() {
   char input;
@@ -106,10 +108,18 @@ int main() {
               printf("\nPolynomial copy:\n");
               printPolynomial(copyPoly);
 
+              double time_spent = 0.0;
+
+              clock_t begin = clock();
+
               printf("\nPolynomial product Decrease and conquer:\n");
               struct Polynomial *productDecrease =
                   decreaseAndConquer(polynomial, copyPoly);
               printPolynomial(productDecrease);
+
+              clock_t end = clock();
+              time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+              printf("time elapsed is %f seconds", time_spent);
 
               freePolynomial(productDecrease);
               freePolynomial(polynomial);
@@ -147,8 +157,14 @@ int main() {
             }
             break;
 
+          case '4':
+            if (input == '4') {
+              dACTestPlotFile(100, 20000, 100);
+            }
+            break;
+
           default:
-            printf("Enter a valid number");
+            printf("\n############### Invalid option ###############\n");
             break;
           }
         } while (true);
@@ -156,7 +172,7 @@ int main() {
       break;
 
     default:
-      printf("Enter a valid number");
+      printf("\n############### Invalid option ###############\n");
       break;
     }
   } while (true);
