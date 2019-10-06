@@ -37,7 +37,7 @@ struct Polynomial *copyPolynomial(struct Polynomial *polynomial) {
  *  Compares the degrees of the polinomials and overwrite the coefficients of
  *  the  greatest one with the sum result.
  *
- *  \param Polynomials.
+ *  \param Complete Polynomials(with all the terms).
  *  \return A polynomial with the Sum of the polynomials.
  */
 struct Polynomial *addPolynomials(struct Polynomial *poly1,
@@ -58,6 +58,8 @@ struct Polynomial *addPolynomials(struct Polynomial *poly1,
     node_greatest_poly = node_greatest_poly->next;
     node_lesser_poly = node_lesser_poly->next;
   }
+
+  freePolynomial(lesser_poly);
   return greatest_poly;
 }
 

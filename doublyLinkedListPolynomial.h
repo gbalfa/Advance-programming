@@ -59,6 +59,44 @@ void push(struct Polynomial *poly, double new_coeff, int new_exp) {
 }
 
 /**
+ *  Append a node into a polynomial.
+ *
+ *  Function to insert a polynomial node at the end of the Doubly Linked
+ *  List.
+ *
+ *  @poly Polinomial struct.
+ *  @new_coeff Monomial coefficient.
+ *  @new_exp Monomial exponent.
+ */
+void append(struct Polynomial *poly, double new_coeff, int new_exp) {
+  /* allocate node */
+  struct Node *new_node = (struct Node *)malloc(sizeof(struct Node));
+
+  /* put in the data  */
+  new_node->coeff = new_coeff;
+  new_node->exp = new_exp;
+
+  /* since we are adding at the end,
+     next is always NULL */
+  new_node->next = NULL;
+
+  /* link the old node off the new node */
+  new_node->prev = (poly->tail);
+
+  /* change next of tail node to new node */
+  if (poly->tail != NULL)
+    (poly->tail)->next = new_node;
+
+  /* move the tail to point to the new node */
+  poly->tail = new_node;
+
+  /* link the head  */
+  if (poly->head == NULL) {
+    poly->head = poly->tail;
+  }
+}
+
+/**
  *  \brief Generates the polynomial.
  *
  *  Generates a random polynomial pushing (n+1) nodes into a doublylinkedlist.
@@ -100,6 +138,38 @@ void freePolynomial(struct Polynomial *polynomial) {
     free(tmp);
   }
   free(polynomial);
+}
+
+/**
+ *  \brief Frees the polynomial nodes memory.
+ *
+ *  \param Node struct.
+ */
+void freePolynomial_nodes(struct Node *head_polynomial) {
+  struct Node *tmp;
+  while (head_polynomial != NULL) {
+    tmp = head_polynomial;
+    head_polynomial = head_polynomial->next;
+    free(tmp);
+  }
+}
+
+/**
+ *  \brief Print the polynomial nodes.
+ *
+ *  \param Node struct.
+ */
+void printPolynomial_nodes(struct Node *node) {
+  if(node == NULL) return;
+  /* first node */
+  printf("%f*X^%d", node->coeff, node->exp);
+  node = node->next;
+  /* the rest of the nodes */
+  while (node != NULL) {
+    printf(" + %f*X^%d", node->coeff, node->exp);
+    node = node->next;
+  }
+  printf("\n");
 }
 
 /**

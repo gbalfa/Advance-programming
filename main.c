@@ -3,6 +3,7 @@
 /* Compiler: gcc */
 #include "basicPolynomialArithmetics.h"
 #include "doublyLinkedListPolynomial.h"
+#include "advancePolynomialArithmetics2.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -62,7 +63,8 @@ int main() {
           printf("\n##############################################");
           printf("\n1. Brute Force");
           printf("\n2. Decrease and Conquer");
-          printf("\n3. Brute Force and Decrease-and-Conquer");
+          printf("\n3. Divide and Conquer");
+          printf("\n4. Decrease-and-Conquer and Divide-and-Conquer");
           printf("\n0. Back");
           printf("\nChoose an option: ");
           scanf("\n%c", &input);
@@ -159,6 +161,36 @@ int main() {
 
           case '4':
             if (input == '4') {
+              printf("Enter the degree of the polynomial to generate: ");
+              scanf("%d", &n);
+
+              struct Polynomial *polynomial = generatePolynomial(n);
+              printf("\n##############################################");
+              printf("\nGenerated polynomial:\n");
+              printPolynomial(polynomial);
+
+              struct Polynomial *copyPoly = copyPolynomial(polynomial);
+              printf("\nPolynomial copy:\n");
+              printPolynomial(copyPoly);
+
+              printf("\nPolynomial product Decrease and conquer:\n");
+              struct Polynomial *productDecrease =
+                  decreaseAndConquer(polynomial, copyPoly);
+              printPolynomial(productDecrease);
+
+              struct Node *head_poly3 = NULL;
+              head_poly3 = divAndConquer(polynomial->head, copyPoly->head, n + 1);
+              printPolynomial_nodes(head_poly3);
+
+              freePolynomial_nodes(head_poly3);
+              freePolynomial(productDecrease);
+              freePolynomial(polynomial);
+              freePolynomial(copyPoly);
+            }
+            break;
+
+          case '5':
+            if (input == '5') {
               dACTestPlotFile(100, 20000, 100);
             }
             break;
