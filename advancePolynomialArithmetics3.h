@@ -146,6 +146,8 @@ void splitPolynomial(struct Polynomial *poly, int new_k,
   second_half->head = result_tail->next;
   second_half->tail = poly->tail;
   second_half->degree = poly->degree;
+
+  result_tail->next = NULL;
   /* printf("%d %s\n",k,"polytoSplitResult:"); */
   /* printPolynomial_nodes(result_head); */
   /* printf("%d %s\n",k,"secondPolytoSplitResult:"); */
@@ -285,18 +287,12 @@ struct Polynomial *divAndConquer(struct Polynomial *poly1,
 
   // Reconnect
   first_half_poly1->tail->next = second_half_poly1->head;
-  /* second_half_poly1->tail->next = first_half_poly2->head; */
   first_half_poly2->tail->next = second_half_poly2->head;
 
   free(first_half_poly1);
   free(second_half_poly1);
   free(first_half_poly2);
   free(second_half_poly2);
-  /* freePolynomial_nodes(first_half_poly1); */
-  /* freePolynomial_nodes(second_half_poly1); */
-  /* freePolynomial_nodes(first_half_poly2); */
-  /* freePolynomial_nodes(second_half_poly2); */
-
   return result;
 }
 
