@@ -1,13 +1,13 @@
 /* Laboratory Advance Programming */
 /* Authors: Gabriel Badilla & Rodrigo Kobayashi */
 /* Compiler: gcc */
+#include "advancePolynomialArithmetics2.h"
 #include "basicPolynomialArithmetics.h"
 #include "doublyLinkedListPolynomial.h"
-#include "advancePolynomialArithmetics2.h"
+#include "plot.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "plot.h"
 
 int main() {
   char input;
@@ -71,7 +71,7 @@ int main() {
           if (input == '0') {
             break;
           }
-          switch (input) {  // Nested switch.
+          switch (input) { // Nested switch.
           case '1':
             if (input == '1') {
               printf("Enter the degree of the polynomial to generate: ");
@@ -178,11 +178,11 @@ int main() {
                   decreaseAndConquer(polynomial, copyPoly);
               printPolynomial(productDecrease);
 
-              struct Node *head_poly3 = NULL;
-              head_poly3 = divAndConquer(polynomial->head, copyPoly->head, n + 1);
-              printPolynomial_nodes(head_poly3);
+              struct Polynomial *head_poly3 = NULL;
+              head_poly3 = divideAndConquer(polynomial, copyPoly);
+              printPolynomial(head_poly3);
 
-              freePolynomial_nodes(head_poly3);
+              freePolynomial(head_poly3);
               freePolynomial(productDecrease);
               freePolynomial(polynomial);
               freePolynomial(copyPoly);

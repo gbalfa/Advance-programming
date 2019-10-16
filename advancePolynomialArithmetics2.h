@@ -5,143 +5,10 @@
 #include "doublyLinkedListPolynomial.h"
 #include <stdlib.h>
 
-/* /\** */
-/*  *  \brief Add polynomial nodes in poly1 and delete poly2. */
-/*  * */
-/*  *  \param param */
-/*  *  \return return type */
-/*  *\/ */
-/* struct Node *addPolynomial_nodes(struct Node *poly1, struct Node *poly2) { */
-/*   struct Node *tmp = poly1, *tmp1 = poly2; */
-/*   while (tmp != NULL && tmp1 != NULL) { */
-/*     tmp->coeff += tmp1->coeff; */
-/*     tmp = tmp->next; */
-/*     tmp1 = tmp1->next; */
-/*   } */
-/*   freePolynomial_nodes(poly2); */
-/*   return poly1; */
-/* } */
-
-/* /\** */
-/*  *  \brief Add polynomial nodes in poly1 and delete poly2. */
-/*  * */
-/*  *  \param param */
-/*  *  \return return type */
-/*  *\/ */
-/* struct Node *substractPolynomial_nodes(struct Node *poly1, struct Node *poly2) { */
-/*   struct Node *tmp = poly1, *tmp1 = poly2; */
-/*   while (tmp != NULL && tmp1 != NULL) { */
-/*     tmp->coeff -= tmp1->coeff; */
-/*     tmp = tmp->next; */
-/*     tmp1 = tmp1->next; */
-/*   } */
-/*   freePolynomial_nodes(poly2); */
-/*   return poly1; */
-/* } */
-
-/**
- *  \brief Multiply two Monomials.
- *
- *  \params Node
- *  \return void
- */
-void multiplyMonomials(struct Node *mono1, struct Node *mono2,
-                       struct Node **pos) {
-  int exp = mono1->exp + mono2->exp;
-  struct Node *node = (*pos);
-
-  if (exp < node->exp) {
-    while (node != NULL && exp < node->exp) {
-      node = node->prev;
-    }
-  } else {
-    while (node != NULL && exp > node->exp ) {
-      node = node->next;
-    }
-  }
-  node->coeff += mono1->coeff * mono2->coeff;
-  node->exp = exp;
-
-  (*pos) = node;
-  return;
-}
-
-void splitPolynomial(struct Node *head_poly, int new_k,
-                     struct Node **first_half, struct Node **first_half_tail,
-                     struct Node **second_half) {
-  struct Node *result_tail = NULL;
-
-  struct Node *tmp = head_poly;
-  for (int i = new_k; i > 0; --i) {
-    result_tail = tmp;
-    tmp = tmp->next;
-  }
-
-  result_tail->next = NULL;
-
-  *first_half = head_poly;
-  *first_half_tail = result_tail;
-  *second_half = tmp;
-
-  return;
-}
-
-/**
- *  \brief Inductive Divide and Conquer Polynomial multiplication.
- */
-void dAC(struct Node *poly1, struct Node *poly2, struct Node **pos, int k) {
-  /* printf("%s\n", "polyss:"); */
-  /* printPolynomial_nodes(poly1); */
-  /* printPolynomial_nodes(poly2); */
-  if (k == 1) {
-    return multiplyMonomials(poly1, poly2, pos);
-  }
-
-  struct Node *first_half_poly1, *first_half_poly1_tail, *second_half_poly1,
-      *first_half_poly2, *first_half_poly2_tail, *second_half_poly2;
-
-  int new_k = k / 2;
-  splitPolynomial(poly1, new_k, &first_half_poly1, &first_half_poly1_tail,
-                  &second_half_poly1);
-  splitPolynomial(poly2, new_k, &first_half_poly2, &first_half_poly2_tail,
-                  &second_half_poly2);
-
-  struct Node *extra_pos;
-
-  dAC(first_half_poly1, first_half_poly2, pos, new_k);
-  extra_pos = (*pos); //
-  dAC(first_half_poly1, second_half_poly2, &extra_pos, new_k);
-  dAC(second_half_poly1, first_half_poly2, pos, new_k);
-  dAC(second_half_poly1, second_half_poly2, pos, new_k);
-
-  first_half_poly1_tail->next = second_half_poly1;
-  first_half_poly2_tail->next = second_half_poly2;
-
-  return;
-}
-
-struct Polynomial *divideAndConquer(struct Polynomial *poly1,
-                                    struct Polynomial *poly2) {
-  int k = poly1->degree + 1;
-  struct Polynomial *result;
-  result = (struct Polynomial *)malloc(sizeof(struct Polynomial));
-  result->head = NULL;
-  result->tail = NULL;
-  result->degree = poly1->degree + poly2->degree;
-  for (int i = result->degree; i >= 0; --i) {
-    push(result, 0, i);
-  }
-  struct Node *pos = result->head;
-
-  dAC(poly1->head, poly2->head, &pos, k);
-
-  return result;
-}
-
 /**
  *  \brief Create Node.
  */
-struct Node *createNode(double new_coeff, int new_exp){
+struct Node *createNode(double new_coeff, int new_exp) {
   struct Node *new_node = (struct Node *)malloc(sizeof(struct Node));
   /* put in the data  */
   new_node->coeff = new_coeff;
@@ -152,7 +19,7 @@ struct Node *createNode(double new_coeff, int new_exp){
 /**
  *  \brief Push_nodes
  */
-void pushNode(struct Node **head_ref, double new_coeff, int new_exp){
+void pushNode(struct Node **head_ref, double new_coeff, int new_exp) {
   struct Node *new_node = createNode(new_coeff, new_exp);
   /* since we are adding at the beginning,
      prev is always NULL */
@@ -167,9 +34,260 @@ void pushNode(struct Node **head_ref, double new_coeff, int new_exp){
 }
 
 /**
- *  \brief Karatsuba.
+ *  \brief Add polynomial nodes in a polynomial passed by argument.
+ *
+ * poly1 degree <= poly2 degree.
+ *
+ *  \param param
+ *  \return return type
  */
-void dAC_karatsuba(struct Node *poly1, struct Node *poly2, struct Node **pos, int k) {
+void addPolynomial_nodes_out(struct Node *poly1, struct Node *poly2,
+                             struct Node **pos) {
+  int exp = poly1->exp;
+  struct Node *node = (*pos);
+
+  if (exp < node->exp) {
+    while (node != NULL && exp < node->exp) {
+      node = node->prev;
+    }
+  } else {
+    while (node != NULL && exp > node->exp) {
+      node = node->next;
+    }
+  }
+  (*pos) = node;
+
+  struct Node *tmp = poly1, *tmp1 = poly2;
+  while (tmp != NULL && tmp1 != NULL) {
+    tmp->coeff += tmp1->coeff;
+    tmp = tmp->next;
+    tmp1 = tmp1->next;
+  }
+  return;
+}
+
+/* *
+ *  \brief Add polynomials poly1 and poly2 in a new polynomial.
+ *
+ *  poly1 degree <= poly2 degree
+ *
+ *  \param param
+ *  \return return type
+ */
+struct Node *addPolynomial_nodes(struct Node *poly1, struct Node *poly2,
+                                 int poly2_tail_exp) {
+  struct Node *result = NULL;
+  for (int i = poly2_tail_exp; i >= poly1->exp; --i) {
+    pushNode(&result, 0, i);
+  }
+  struct Node *tmp0 = result, *tmp1 = poly1, *tmp2 = poly2;
+  while (tmp1 != NULL && tmp1->exp < poly2->exp) {
+    tmp0->coeff = tmp1->coeff;
+    tmp0 = tmp0->next;
+    tmp1 = tmp1->next;
+  }
+  while (tmp1 != NULL) {
+    tmp0->coeff = tmp1->coeff + tmp2->coeff;
+    tmp0 = tmp0->next;
+    tmp1 = tmp1->next;
+    tmp2 = tmp2->next;
+  }
+  while (tmp2 != NULL) {
+    tmp0->coeff = tmp2->coeff;
+    tmp0 = tmp0->next;
+    tmp2 = tmp2->next;
+  }
+  return result;
+}
+
+/* /\** */
+/*  *  \brief Add polynomials poly1 and poly2 without adding extra memory. */
+/*  * */
+/*  *  poly1 degree <= poly2 degree */
+/*  *\/ */
+/* struct Node *addPolynomial_nodes(struct Node *poly1, struct Node *poly2, */
+/*                                  struct Node *poly1_tail) { */
+/*   struct Node *tmp0, *tmp1, *tmp2, *special_tail; */
+
+/*   tmp0 = poly1_tail; */
+/*   while (tmp0 != NULL && tmp0->exp >= poly2->exp) { */
+/*     tmp0 = tmp0->prev; */
+/*   } */
+/*   special_tail = tmp0; */
+/*   // */
+/*   tmp1 = poly2; */
+/*   tmp2 = tmp0->next; */
+/*   while (tmp2 != NULL) { */
+/*     tmp1->coeff += tmp2->coeff; */
+/*     tmp1 = tmp1->next; */
+/*     tmp2 = tmp2->next; */
+/*   } */
+/*   freePolynomial_nodes(special_tail->next); */
+/*   special_tail->next = poly2; */
+/*   poly2->prev = special_tail; */
+
+/*   return poly1; */
+/* } */
+
+/**
+ *  \brief Moves across a polynomial until it reaches a specific exp;
+ */
+void lookForExpPos(struct Node **pos, int exp) {
+  struct Node *tmp = (*pos);
+  //
+  if (tmp->exp < exp) {
+    while (tmp != NULL && tmp->exp < exp) {
+      tmp = tmp->next;
+      /* ++(*contador); */
+    }
+  } else {
+    while (tmp != NULL && tmp->exp > exp) {
+      tmp = tmp->prev;
+      /* ++(*contador); */
+    }
+  }
+  (*pos) = tmp;
+  return;
+}
+
+void decreaseAndConquer_forDAC(struct Node *poly1, struct Node *poly2,
+                               struct Node **sum_pos_ref,
+                               struct Node **subtract_pos_ref, int sum_gap,
+                               int subtract_gap) {
+  struct Node *sum_pos, *head_sum_result, *factor1, *factor2, *start_sum_pos,
+      *tail_sum;
+  int sum_exp, subtract_exp;
+  double multiplication;
+
+  // If there is subtraction.
+  if (subtract_gap != 0) {
+    struct Node *subtract_pos, *head_subtract_result, *start_subtract_pos,
+        *tail_subtract;
+
+    // Subtract position.
+    subtract_exp = (poly1->exp + poly2->exp) + subtract_gap;
+    subtract_pos = (*subtract_pos_ref);
+    lookForExpPos(&subtract_pos, subtract_exp);
+    head_subtract_result = subtract_pos;
+    // Sum position.
+    sum_exp = (poly1->exp + poly2->exp) + sum_gap;
+    sum_pos = (*sum_pos_ref);
+    lookForExpPos(&sum_pos, sum_exp);
+    head_sum_result = sum_pos;
+
+    factor1 = poly1;
+    factor2 = NULL;
+    start_sum_pos = head_sum_result;
+    start_subtract_pos = head_subtract_result;
+    sum_pos = NULL;
+    subtract_pos = NULL;
+    while (factor1 != NULL) {
+      sum_pos = start_sum_pos;
+      subtract_pos = start_subtract_pos;
+      factor2 = poly2;
+      while (factor2 != NULL) {
+        multiplication = factor1->coeff * factor2->coeff;
+        sum_pos->coeff += multiplication;
+        subtract_pos->coeff -= multiplication;
+        sum_pos = sum_pos->next;
+        subtract_pos = subtract_pos->next;
+        factor2 = factor2->next;
+      }
+      factor1 = factor1->next;
+      tail_sum = start_sum_pos;
+      start_sum_pos = start_sum_pos->next;
+      tail_subtract = start_subtract_pos;
+      start_subtract_pos = start_subtract_pos->next;
+    }
+    (*sum_pos_ref) = tail_sum;
+    (*subtract_pos_ref) = tail_subtract;
+
+  } else {
+    sum_exp = (poly1->exp + poly2->exp) + sum_gap;
+    sum_pos = (*sum_pos_ref);
+    lookForExpPos(&sum_pos, sum_exp);
+    head_sum_result = sum_pos;
+
+    factor1 = poly1;
+    factor2 = NULL;
+    start_sum_pos = head_sum_result;
+    sum_pos = NULL;
+    while (factor1 != NULL) {
+      sum_pos = start_sum_pos;
+      factor2 = poly2;
+      while (factor2 != NULL) {
+        multiplication = factor1->coeff * factor2->coeff;
+        sum_pos->coeff += multiplication;
+        sum_pos = sum_pos->next;
+        factor2 = factor2->next;
+      }
+      factor1 = factor1->next;
+      tail_sum = start_sum_pos;
+      start_sum_pos = start_sum_pos->next;
+    }
+    (*sum_pos_ref) = tail_sum;
+  }
+  return;
+}
+
+/**
+ *  \brief Multiply two Monomials and save the result on a external poly.
+ *
+ *  \params Node
+ *  \return void
+ */
+void multiplyMonomials(struct Node *mono1, struct Node *mono2,
+                       struct Node **pos) {
+  int exp = mono1->exp + mono2->exp;
+  struct Node *node = (*pos);
+
+  if (exp < node->exp) {
+    while (node != NULL && exp < node->exp) {
+      node = node->prev;
+      /* ++(*contador); */
+    }
+  } else {
+    while (node != NULL && exp > node->exp) {
+      node = node->next;
+      /* ++(*contador); */
+    }
+  }
+  node->coeff += mono1->coeff * mono2->coeff;
+  node->exp = exp;
+
+  (*pos) = node;
+  return;
+}
+
+/**
+ *  \brief Split a polynomial in two.
+ */
+void splitPolynomial_DAC(struct Node *head_poly, int new_k,
+                         struct Node **first_half,
+                         struct Node **first_half_tail,
+                         struct Node **second_half) {
+  struct Node *result_tail = NULL;
+
+  struct Node *tmp = head_poly;
+  for (int i = new_k; i > 0; --i) {
+    result_tail = tmp;
+    tmp = tmp->next;
+    /* ++(*contador); */
+  }
+
+  result_tail->next = NULL;
+
+  *first_half = head_poly;
+  *first_half_tail = result_tail;
+  *second_half = tmp;
+
+  return;
+}
+
+/**
+ *  \brief Recursive auxiliar function to do Inductive Divide and Conquer.
+ */
+void dAC(struct Node *poly1, struct Node *poly2, struct Node **pos, int k) {
   /* printf("%s\n", "polyss:"); */
   /* printPolynomial_nodes(poly1); */
   /* printPolynomial_nodes(poly2); */
@@ -181,16 +299,16 @@ void dAC_karatsuba(struct Node *poly1, struct Node *poly2, struct Node **pos, in
       *first_half_poly2, *first_half_poly2_tail, *second_half_poly2;
 
   int new_k = k / 2;
-  splitPolynomial(poly1, new_k, &first_half_poly1, &first_half_poly1_tail,
-                  &second_half_poly1);
-  splitPolynomial(poly2, new_k, &first_half_poly2, &first_half_poly2_tail,
-                  &second_half_poly2);
+  splitPolynomial_DAC(poly1, new_k, &first_half_poly1, &first_half_poly1_tail,
+                      &second_half_poly1);
+  splitPolynomial_DAC(poly2, new_k, &first_half_poly2, &first_half_poly2_tail,
+                      &second_half_poly2);
 
-  struct Node *extra_pos;
+  /* struct Node *extra_pos; */
 
   dAC(first_half_poly1, first_half_poly2, pos, new_k);
-  extra_pos = (*pos); //
-  dAC(first_half_poly1, second_half_poly2, &extra_pos, new_k);
+  /* extra_pos = (*pos); // */
+  dAC(first_half_poly1, second_half_poly2, pos, new_k);
   dAC(second_half_poly1, first_half_poly2, pos, new_k);
   dAC(second_half_poly1, second_half_poly2, pos, new_k);
 
@@ -200,7 +318,10 @@ void dAC_karatsuba(struct Node *poly1, struct Node *poly2, struct Node **pos, in
   return;
 }
 
-struct Polynomial *karatsuba(struct Polynomial *poly1,
+/**
+ *  \brief Inductive Divide and Conquer Polynomial multiplication.
+ */
+struct Polynomial *divideAndConquer(struct Polynomial *poly1,
                                     struct Polynomial *poly2) {
   int k = poly1->degree + 1;
   struct Polynomial *result;
@@ -212,217 +333,152 @@ struct Polynomial *karatsuba(struct Polynomial *poly1,
     push(result, 0, i);
   }
   struct Node *pos = result->head;
+  int contador = 0;
 
-  dAC_karatsuba(poly1->head, poly2->head, &pos, k);
+  dAC(poly1->head, poly2->head, &pos, k);
+
+  printf("%d\n", contador);
 
   return result;
 }
 
-/* /\** */
-/*  *  \brief Sum 4 polynomials of divide and conquer. */
-/*  * */
-/*  *  Multiply poly3 by X^k and poly21-poly22 by X^new_k while adding. */
-/*  * */
-/*  *  \return A polynomial with the Sum of the polynomials. */
-/*  *\/ */
-/* struct Node *addPolynomialNodes_DivideAndConquer( */
-/*     struct Node *poly1, struct Node *tail_poly1, struct Node *poly21, */
-/*     struct Node *tail_poly21, struct Node *poly22, struct Node
- * *tail_poly22,
+/**
+ *  \brief Split in two parts a polynomial.
+ *
+ *  Decrease the exponents of the greatest resultant polynomial by a new_k
+ *  factor.
  */
-/*     struct Node *poly3) { */
-/*   /\* printf("%s\n", "polys to sum:"); *\/ */
-/*   /\* printPolynomial_nodes(poly3); *\/ */
-/*   /\* printPolynomial_nodes(poly21); *\/ */
-/*   /\* printPolynomial_nodes(poly22); *\/ */
-/*   /\* printPolynomial_nodes(poly1); *\/ */
-/*   struct Node *tmp0, *tmp1, *tmp12, *tmp2, *tmp3, *tmp4, *tmp5,
- * *special_tail_1, */
-/*       *special_tail_2, *special_tail_3; */
+void splitPolynomial_karatsuba(struct Node *head_poly, int new_k,
+                               struct Node **first_half,
+                               struct Node **first_half_tail,
+                               struct Node **second_half,
+                               struct Node **second_half_tail) {
+  struct Node *result_tail = NULL;
 
-/*   tmp0 = tail_poly1; */
-/*   while (tmp0 != NULL && tmp0->exp >= poly21->exp) { */
-/*     /\* printf("%d\n", poly21->exp + new_k); *\/ */
-/*     /\* printf("%d\n", tmp0->exp); *\/ */
-/*     tmp0 = tmp0->prev; */
-/*   } */
-/*   special_tail_1 = tmp0; */
-/*   // */
-/*   tmp1 = poly21; */
-/*   tmp12 = poly22; */
-/*   tmp2 = tmp0->next; */
-/*   while (tmp2 != NULL) { */
-/*     tmp1->coeff += tmp2->coeff + tmp12->coeff; */
-/*     /\* tmp1->exp = tmp2->exp; *\/ */
-/*     tmp1 = tmp1->next; */
-/*     tmp12 = tmp12->next; */
-/*     tmp2 = tmp2->next; */
-/*   } */
-/*   // */
-/*   tmp3 = tmp1; */
-/*   while (tmp3 != NULL && tmp3->exp < poly3->exp) { */
-/*     /\* tmp3->exp += new_k; *\/ */
-/*     tmp3->coeff += tmp12->coeff; */
-/*     special_tail_2 = tmp3; */
-/*     tmp3 = tmp3->next; */
-/*     tmp12 = tmp12->next; */
-/*   } */
-/*   // */
-/*   // */
-/*   tmp4 = poly3; */
-/*   tmp5 = tmp3; */
-/*   while (tmp5 != NULL) { */
-/*     tmp4->coeff += tmp5->coeff + tmp12->coeff; */
-/*     /\* tmp4->exp = tmp5->exp + new_k; *\/ */
-/*     special_tail_3 = tmp4; */
-/*     tmp4 = tmp4->next; */
-/*     tmp5 = tmp5->next; */
-/*     tmp12 = tmp12->next; */
-/*   } */
-/*   // */
-/*   /\* tmp6 = tmp4; *\/ */
-/*   /\* while (tmp6 != NULL) { *\/ */
-/*   /\*   /\\* tmp6->exp += k; *\\/ *\/ */
-/*   /\*   tmp6 = tmp6->next; *\/ */
-/*   /\* } *\/ */
-/*   /\* printPolynomial_nodes(special_tail_1); *\/ */
-/*   /\* printPolynomial_nodes(special_tail_2); *\/ */
-/*   /\* printPolynomial_nodes(poly21); *\/ */
+  struct Node *tmp = head_poly;
+  for (int i = new_k; i > 0; --i) {
+    result_tail = tmp;
+    tmp = tmp->next;
+    /* ++(*contador); */
+  }
+  result_tail->next = NULL;
+  (*first_half) = head_poly;
+  (*first_half_tail) = result_tail;
+  (*second_half) = tmp;
 
-/*   freePolynomial_nodes(special_tail_1->next); */
-/*   special_tail_1->next = poly21; */
-/*   poly21->prev = special_tail_1; */
+  for (int i = new_k; i > 0; --i) {
+    tmp->exp -= new_k;
+    result_tail = tmp;
+    tmp = tmp->next;
+  }
+  (*second_half_tail) = result_tail;
+  return;
+}
 
-/*   freePolynomial_nodes(special_tail_2->next); */
-/*   special_tail_2->next = poly3; */
-/*   poly3->prev = special_tail_2; */
+/**
+ *  \brief Karatsuba recursive auxiliar function.
+ *
+ *  \param pos: used to save positions of the resultant polynomial (that is
+ *  passed by reference) and therefore decrease the linked list travels.
+ *
+ *  \param gaps: used to save the resultant polynomial in the right position
+ *  according to the multiplying factors.
+ */
+void dAC_karatsuba(struct Node *poly1, struct Node *poly2,
+                   struct Node **sum_pos_ref, struct Node **subtract_pos_ref,
+                   int sum_gap, int subtract_gap, int k) {
+  /* printf("%s\n", "polyss:"); */
+  /* printPolynomial_nodes(poly1); */
+  /* printPolynomial_nodes(poly2); */
+  if (k == 4) {
+    return decreaseAndConquer_forDAC(poly1, poly2, sum_pos_ref,
+                                     subtract_pos_ref, sum_gap, subtract_gap);
+  }
 
-/*   freePolynomial_nodes(poly22); */
+  struct Node *first_half_poly1, *first_half_poly1_tail, *second_half_poly1,
+      *second_half_poly1_tail, *first_half_poly2, *first_half_poly2_tail,
+      *second_half_poly2, *second_half_poly2_tail;
 
-/*   /\* if (special_tail_3 != NULL && special_tail_3->prev != NULL) { *\/ */
-/*   /\*   if (special_tail_3->next != NULL) { *\/ */
-/*   /\*     special_tail_3->next->prev = NULL; *\/ */
-/*   /\*   } *\/ */
-/*   /\*   special_tail_3->next = NULL; *\/ */
-/*   /\*   freePolynomial_nodes(poly3); *\/ */
-/*   /\* } *\/ */
-/*   /\* printPolynomial_nodes(poly1); *\/ */
-/*   /\* printPolynomial_nodes(poly3); *\/ */
+  int new_k = k / 2;
+  splitPolynomial_karatsuba(poly1, new_k, &first_half_poly1,
+                            &first_half_poly1_tail, &second_half_poly1,
+                            &second_half_poly1_tail);
+  splitPolynomial_karatsuba(poly2, new_k, &first_half_poly2,
+                            &first_half_poly2_tail, &second_half_poly2,
+                            &second_half_poly2_tail);
 
-/*   return poly1; */
-/* } */
+  struct Node *sumA0A1 = addPolynomial_nodes(
+      first_half_poly1, second_half_poly1, second_half_poly1_tail->exp);
+  struct Node *sumB0B1 = addPolynomial_nodes(
+      first_half_poly2, second_half_poly2, second_half_poly2_tail->exp);
+  //
+  dAC_karatsuba(first_half_poly1, first_half_poly2, sum_pos_ref,
+                subtract_pos_ref, sum_gap, subtract_gap + new_k, new_k);
+  dAC_karatsuba(sumA0A1, sumB0B1, sum_pos_ref,
+                subtract_pos_ref, sum_gap + new_k, subtract_gap, new_k);
+  dAC_karatsuba(second_half_poly1, second_half_poly2, sum_pos_ref,
+                subtract_pos_ref, sum_gap + k, subtract_gap + new_k, new_k);
 
-/* /\** */
-/*  *  \brief Sum 3 polynomials of divide and conquer. */
-/*  * */
-/*  *  Multiply poly1 by X^k and poly21-poly22 by X^new_k while adding. */
-/*  * */
-/*  *  \return A polynomial with the Sum of the polynomials. */
-/*  *\/ */
-/* struct Node *addPolynomialNodes_karatsuba(struct Node *poly1, */
-/*                                           struct Node *poly21, */
-/*                                           struct Node *poly22, */
-/*                                           struct Node *poly3, int k, */
-/*                                           int new_k) { */
-/*   /\* printf("%s\n", "polys to sum:"); *\/ */
-/*   /\* printPolynomial_nodes(poly3); *\/ */
-/*   /\* printPolynomial_nodes(poly21); *\/ */
-/*   /\* printPolynomial_nodes(poly1); *\/ */
-/*   struct Node *tmp0, *tmp1, *tmp12, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6, */
-/*       *special_tail_1, *special_tail_2, *special_tail_3; */
+  freePolynomial_nodes(sumA0A1);
+  freePolynomial_nodes(sumB0B1);
+  first_half_poly1_tail->next = second_half_poly1;
+  first_half_poly2_tail->next = second_half_poly2;
+  return;
+}
 
-/*   tmp0 = poly1; */
-/*   while (tmp0 != NULL && tmp0->exp < poly21->exp + new_k) { */
-/*     /\* printf("%d\n", poly21->exp + new_k); *\/ */
-/*     /\* printf("%d\n", tmp0->exp); *\/ */
-/*     special_tail_1 = tmp0; */
-/*     tmp0 = tmp0->next; */
-/*   } */
-/*   // */
-/*   tmp1 = poly21; */
-/*   tmp12 = poly22; */
-/*   tmp2 = tmp0; */
-/*   while (tmp2 != NULL) { */
-/*     tmp1->coeff += tmp2->coeff + tmp12->coeff; */
-/*     tmp1->exp = tmp2->exp; */
-/*     tmp1 = tmp1->next; */
-/*     tmp12 = tmp12->next; */
-/*     tmp2 = tmp2->next; */
-/*   } */
-/*   // */
-/*   tmp3 = tmp1; */
-/*   while (tmp3 != NULL && tmp3->exp + new_k < poly3->exp + k) { */
-/*     tmp3->exp += new_k; */
-/*     tmp3->coeff += tmp12->coeff; */
-/*     special_tail_2 = tmp3; */
-/*     tmp3 = tmp3->next; */
-/*     tmp12 = tmp12->next; */
-/*   } */
-/*   // */
-/*   tmp4 = poly3; */
-/*   tmp5 = tmp3; */
-/*   while (tmp5 != NULL) { */
-/*     tmp4->coeff += tmp5->coeff + tmp12->coeff; */
-/*     tmp4->exp = tmp5->exp + new_k; */
-/*     special_tail_3 = tmp4; */
-/*     tmp4 = tmp4->next; */
-/*     tmp5 = tmp5->next; */
-/*     tmp12 = tmp12->next; */
-/*   } */
-/*   // */
-/*   tmp6 = tmp4; */
-/*   while (tmp6 != NULL) { */
-/*     tmp6->exp += k; */
-/*     tmp6 = tmp6->next; */
-/*   } */
+/**
+ *  \brief Karatsuba
+ */
+struct Polynomial *karatsuba(struct Polynomial *poly1,
+                             struct Polynomial *poly2) {
+  int k = poly1->degree + 1;
+  struct Polynomial *result;
+  result = (struct Polynomial *)malloc(sizeof(struct Polynomial));
+  result->head = NULL;
+  result->tail = NULL;
+  result->degree = poly1->degree + poly2->degree;
+  for (int i = result->degree; i >= 0; --i) {
+    push(result, 0, i);
+  }
+  struct Node *sum_pos = result->head;
+  struct Node *subtract_pos = result->head;
 
-/*   special_tail_1->next = poly21; */
-/*   freePolynomial_nodes(tmp0); */
-/*   special_tail_2->next = poly3; */
-/*   freePolynomial_nodes(tmp3); */
+  dAC_karatsuba(poly1->head, poly2->head, &sum_pos, &subtract_pos, 0, 0, k);
 
-/*   freePolynomial_nodes(poly22); */
+  return result;
+}
 
-/*   if (special_tail_3 != NULL && special_tail_3->prev != NULL) { */
-/*     special_tail_3->next = NULL; */
-/*     freePolynomial_nodes(poly3); */
-/*   } */
-/*   return poly1; */
-/* } */
+void test() {
+  int n = 5368299;
+  struct Polynomial *test = generatePolynomial(n);
 
-/* /\** */
-/*  *  \brief Variant of Divide and Conquer algorithm for Polynomial */
-/*  * multiplication. */
-/*  *\/ */
-/* struct Node *karatsuba(struct Node *poly1, struct Node *poly2, int k) { */
-/*   /\* printf("%s\n", "polyss:"); *\/ */
-/*   /\* printPolynomial_nodes(poly1); *\/ */
-/*   /\* printPolynomial_nodes(poly2); *\/ */
-/*   if (k == 1) { */
-/*     return multiplyMonomials(poly1, poly2); */
-/*   } */
+  double time_spent = 0.0;
 
-/*   struct Node *first_half_poly1, *second_half_poly1, *first_half_poly2, */
-/*       *second_half_poly2; */
+  clock_t begin = clock();
 
-/*   int new_k = k / 2; */
-/*   splitPolynomial(poly1, new_k, &first_half_poly1, &second_half_poly1); */
-/*   splitPolynomial(poly2, new_k, &first_half_poly2, &second_half_poly2); */
+  /* struct Polynomial *copy = copyPolynomial(test); */
 
-/*   struct Node *productA0B0 = karatsuba(first_half_poly1, first_half_poly2,
- * k); */
-/*   struct Node *productA1B1 = karatsuba(second_half_poly1,
- * second_half_poly2, k); */
-/*   struct Node *productOfsumsA0A1_B0B1 = karatuba( */
+  clock_t end = clock();
+  /* time_spent += (double)(end - begin) / CLOCKS_PER_SEC; */
+  /* printf("time elapsed is %f seconds\n", time_spent); */
 
-/*   /\* struct Node *result = addIncompletePolynomialNodes_x( *\/ */
+  time_spent = 0.0;
+  begin = clock();
 
-/*   freePolynomial_nodes(first_half_poly1); */
-/*   freePolynomial_nodes(second_half_poly1); */
-/*   freePolynomial_nodes(first_half_poly2); */
-/*   freePolynomial_nodes(second_half_poly2); */
+  struct Node *node = test->head;
+  int exp = n - 1;
+  for (int i = 0; i < 1000; ++i) {
+    node = test->head;
+    while (node != NULL && exp > node->exp) {
+      node = node->next;
+    }
+  }
 
-/*   return result; */
-/* } */
+  end = clock();
+  time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("time elapsed is %f seconds\n", time_spent);
+
+  freePolynomial(test);
+}
 
 #endif /* ADVANCEPOLYNOMIALARITHMETICS_H */
