@@ -34,39 +34,6 @@ void pushNode(struct Node **head_ref, double new_coeff, int new_exp) {
 }
 
 /**
- *  \brief Add polynomial nodes in a polynomial passed by argument.
- *
- * poly1 degree <= poly2 degree.
- *
- *  \param param
- *  \return return type
- */
-void addPolynomial_nodes_out(struct Node *poly1, struct Node *poly2,
-                             struct Node **pos) {
-  int exp = poly1->exp;
-  struct Node *node = (*pos);
-
-  if (exp < node->exp) {
-    while (node != NULL && exp < node->exp) {
-      node = node->prev;
-    }
-  } else {
-    while (node != NULL && exp > node->exp) {
-      node = node->next;
-    }
-  }
-  (*pos) = node;
-
-  struct Node *tmp = poly1, *tmp1 = poly2;
-  while (tmp != NULL && tmp1 != NULL) {
-    tmp->coeff += tmp1->coeff;
-    tmp = tmp->next;
-    tmp1 = tmp1->next;
-  }
-  return;
-}
-
-/* *
  *  \brief Add polynomials poly1 and poly2 in a new polynomial.
  *
  *  poly1 degree <= poly2 degree
@@ -100,134 +67,42 @@ struct Node *addPolynomial_nodes(struct Node *poly1, struct Node *poly2,
   return result;
 }
 
-/* /\** */
-/*  *  \brief Add polynomials poly1 and poly2 without adding extra memory. */
-/*  * */
-/*  *  poly1 degree <= poly2 degree */
-/*  *\/ */
-/* struct Node *addPolynomial_nodes(struct Node *poly1, struct Node *poly2, */
-/*                                  struct Node *poly1_tail) { */
-/*   struct Node *tmp0, *tmp1, *tmp2, *special_tail; */
-
-/*   tmp0 = poly1_tail; */
-/*   while (tmp0 != NULL && tmp0->exp >= poly2->exp) { */
-/*     tmp0 = tmp0->prev; */
-/*   } */
-/*   special_tail = tmp0; */
-/*   // */
-/*   tmp1 = poly2; */
-/*   tmp2 = tmp0->next; */
-/*   while (tmp2 != NULL) { */
-/*     tmp1->coeff += tmp2->coeff; */
-/*     tmp1 = tmp1->next; */
-/*     tmp2 = tmp2->next; */
-/*   } */
-/*   freePolynomial_nodes(special_tail->next); */
-/*   special_tail->next = poly2; */
-/*   poly2->prev = special_tail; */
-
-/*   return poly1; */
-/* } */
-
 /**
- *  \brief Moves across a polynomial until it reaches a specific exp;
+ *  \brief function description
+ *
+ *  Detailed description
+ *
+ *  \param param
+ *  \return return type
  */
-void lookForExpPos(struct Node **pos, int exp) {
-  struct Node *tmp = (*pos);
-  //
-  if (tmp->exp < exp) {
-    while (tmp != NULL && tmp->exp < exp) {
-      tmp = tmp->next;
-      /* ++(*contador); */
-    }
-  } else {
-    while (tmp != NULL && tmp->exp > exp) {
-      tmp = tmp->prev;
-      /* ++(*contador); */
-    }
-  }
-  (*pos) = tmp;
-  return;
-}
-
-void decreaseAndConquer_forDAC(struct Node *poly1, struct Node *poly2,
-                               struct Node **sum_pos_ref,
-                               struct Node **subtract_pos_ref, int sum_gap,
-                               int subtract_gap) {
+struct Node *decreaseAndConquer_forDAC(struct Node *poly1, struct Node *poly2,
+                               int poly_tail_exp){
   struct Node *sum_pos, *head_sum_result, *factor1, *factor2, *start_sum_pos,
       *tail_sum;
-  int sum_exp, subtract_exp;
-  double multiplication;
 
-  // If there is subtraction.
-  if (subtract_gap != 0) {
-    struct Node *subtract_pos, *head_subtract_result, *start_subtract_pos,
-        *tail_subtract;
-
-    // Subtract position.
-    subtract_exp = (poly1->exp + poly2->exp) + subtract_gap;
-    subtract_pos = (*subtract_pos_ref);
-    lookForExpPos(&subtract_pos, subtract_exp);
-    head_subtract_result = subtract_pos;
-    // Sum position.
-    sum_exp = (poly1->exp + poly2->exp) + sum_gap;
-    sum_pos = (*sum_pos_ref);
-    lookForExpPos(&sum_pos, sum_exp);
-    head_sum_result = sum_pos;
-
-    factor1 = poly1;
-    factor2 = NULL;
-    start_sum_pos = head_sum_result;
-    start_subtract_pos = head_subtract_result;
-    sum_pos = NULL;
-    subtract_pos = NULL;
-    while (factor1 != NULL) {
-      sum_pos = start_sum_pos;
-      subtract_pos = start_subtract_pos;
-      factor2 = poly2;
-      while (factor2 != NULL) {
-        multiplication = factor1->coeff * factor2->coeff;
-        sum_pos->coeff += multiplication;
-        subtract_pos->coeff -= multiplication;
-        sum_pos = sum_pos->next;
-        subtract_pos = subtract_pos->next;
-        factor2 = factor2->next;
-      }
-      factor1 = factor1->next;
-      tail_sum = start_sum_pos;
-      start_sum_pos = start_sum_pos->next;
-      tail_subtract = start_subtract_pos;
-      start_subtract_pos = start_subtract_pos->next;
-    }
-    (*sum_pos_ref) = tail_sum;
-    (*subtract_pos_ref) = tail_subtract;
-
-  } else {
-    sum_exp = (poly1->exp + poly2->exp) + sum_gap;
-    sum_pos = (*sum_pos_ref);
-    lookForExpPos(&sum_pos, sum_exp);
-    head_sum_result = sum_pos;
-
-    factor1 = poly1;
-    factor2 = NULL;
-    start_sum_pos = head_sum_result;
-    sum_pos = NULL;
-    while (factor1 != NULL) {
-      sum_pos = start_sum_pos;
-      factor2 = poly2;
-      while (factor2 != NULL) {
-        multiplication = factor1->coeff * factor2->coeff;
-        sum_pos->coeff += multiplication;
-        sum_pos = sum_pos->next;
-        factor2 = factor2->next;
-      }
-      factor1 = factor1->next;
-      tail_sum = start_sum_pos;
-      start_sum_pos = start_sum_pos->next;
-    }
-    (*sum_pos_ref) = tail_sum;
+  int result_degree = poly_tail_exp * 2;
+  head_sum_result = NULL;
+  for (int i = result_degree; i >= 0; --i) {
+    pushNode(&head_sum_result, 0, i);
   }
-  return;
+
+  factor1 = poly1;
+  factor2 = NULL;
+  start_sum_pos = head_sum_result;
+  sum_pos = NULL;
+  while (factor1 != NULL) {
+    sum_pos = start_sum_pos;
+    factor2 = poly2;
+    while (factor2 != NULL) {
+      sum_pos->coeff += factor1->coeff * factor2->coeff;
+      sum_pos = sum_pos->next;
+      factor2 = factor2->next;
+    }
+    factor1 = factor1->next;
+    tail_sum = start_sum_pos;
+    start_sum_pos = start_sum_pos->next;
+  }
+  return head_sum_result;
 }
 
 /**
@@ -272,9 +147,7 @@ void splitPolynomial_DAC(struct Node *head_poly, int new_k,
   for (int i = new_k; i > 0; --i) {
     result_tail = tmp;
     tmp = tmp->next;
-    /* ++(*contador); */
   }
-
   result_tail->next = NULL;
 
   *first_half = head_poly;
@@ -288,9 +161,6 @@ void splitPolynomial_DAC(struct Node *head_poly, int new_k,
  *  \brief Recursive auxiliar function to do Inductive Divide and Conquer.
  */
 void dAC(struct Node *poly1, struct Node *poly2, struct Node **pos, int k) {
-  /* printf("%s\n", "polyss:"); */
-  /* printPolynomial_nodes(poly1); */
-  /* printPolynomial_nodes(poly2); */
   if (k == 1) {
     return multiplyMonomials(poly1, poly2, pos);
   }
@@ -304,10 +174,7 @@ void dAC(struct Node *poly1, struct Node *poly2, struct Node **pos, int k) {
   splitPolynomial_DAC(poly2, new_k, &first_half_poly2, &first_half_poly2_tail,
                       &second_half_poly2);
 
-  /* struct Node *extra_pos; */
-
   dAC(first_half_poly1, first_half_poly2, pos, new_k);
-  /* extra_pos = (*pos); // */
   dAC(first_half_poly1, second_half_poly2, pos, new_k);
   dAC(second_half_poly1, first_half_poly2, pos, new_k);
   dAC(second_half_poly1, second_half_poly2, pos, new_k);
@@ -343,7 +210,7 @@ struct Polynomial *divideAndConquer(struct Polynomial *poly1,
 }
 
 /**
- *  \brief Split in two parts a polynomial.
+ *  \brief Split a polynomial in two parts and decrease the exponents.
  *
  *  Decrease the exponents of the greatest resultant polynomial by a new_k
  *  factor.
@@ -376,23 +243,78 @@ void splitPolynomial_karatsuba(struct Node *head_poly, int new_k,
 }
 
 /**
- *  \brief Karatsuba recursive auxiliar function.
- *
- *  \param pos: used to save positions of the resultant polynomial (that is
- *  passed by reference) and therefore decrease the linked list travels.
- *
- *  \param gaps: used to save the resultant polynomial in the right position
- *  according to the multiplying factors.
+ *  \brief Add Karatsuba polynomial addends.
  */
-void dAC_karatsuba(struct Node *poly1, struct Node *poly2,
-                   struct Node **sum_pos_ref, struct Node **subtract_pos_ref,
-                   int sum_gap, int subtract_gap, int k) {
-  /* printf("%s\n", "polyss:"); */
-  /* printPolynomial_nodes(poly1); */
-  /* printPolynomial_nodes(poly2); */
-  if (k == 4) {
-    return decreaseAndConquer_forDAC(poly1, poly2, sum_pos_ref,
-                                     subtract_pos_ref, sum_gap, subtract_gap);
+struct Node *addPolynomialNodes_karatsuba(struct Node *A0B0,
+                                          struct Node *third,
+                                          struct Node *A1B1, int k,
+                                          int new_k) {
+  struct Node *tmp0, *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6,
+      *special_tail_1, *special_tail_2;
+
+  tmp0 = A0B0;
+  while (tmp0 != NULL && tmp0->exp < third->exp + new_k) {
+    special_tail_1 = tmp0;
+    tmp0 = tmp0->next;
+  }
+  tmp1 = third;
+  tmp2 = tmp0;
+  while (tmp2 != NULL) {
+    tmp1->coeff += tmp2->coeff;
+    tmp1->exp = tmp2->exp;
+    tmp1 = tmp1->next;
+    tmp2 = tmp2->next;
+  }
+  tmp3 = tmp1;
+  while (tmp3 != NULL && tmp3->exp + new_k < A1B1->exp + k) {
+    tmp3->exp += new_k;
+    special_tail_2 = tmp3;
+    tmp3 = tmp3->next;
+  }
+  tmp4 = A1B1;
+  tmp5 = tmp3;
+  while (tmp5 != NULL) {
+    tmp4->coeff += tmp5->coeff;
+    tmp4->exp = tmp5->exp + new_k;
+    tmp4 = tmp4->next;
+    tmp5 = tmp5->next;
+  }
+  tmp6 = tmp4;
+  while (tmp6 != NULL) {
+    tmp6->exp += k;
+    tmp6 = tmp6->next;
+  }
+  special_tail_1->next = third;
+  freePolynomial_nodes(tmp0);
+  special_tail_2->next = A1B1;
+  freePolynomial_nodes(tmp3);
+
+  return A0B0;
+}
+
+/**
+ *  \brief Subtract A0B0 and A1B1 from poly.
+ */
+struct Node *subtractA0B0_A1B1(struct Node *poly, struct Node *A0B0, struct Node *A1B1){
+  struct Node *tmp0, *tmp1, *tmp2;
+  tmp0 = poly;
+  tmp1 = A0B0;
+  tmp2 = A1B1;
+  while (tmp0 != NULL) {
+    tmp0->coeff -= tmp1->coeff + tmp2->coeff;
+    tmp0 = tmp0->next;
+    tmp1 = tmp1->next;
+    tmp2 = tmp2->next;
+  }
+  return poly;
+}
+
+/**
+ *  \brief Karatsuba recursive auxiliar function.
+ */
+struct Node *dAC_karatsuba(struct Node *poly1, struct Node *poly2, int poly2_tail_exp, int k, int special_k) {
+  if (k == special_k) {
+    return decreaseAndConquer_forDAC(poly1, poly2, poly2_tail_exp);
   }
 
   struct Node *first_half_poly1, *first_half_poly1_tail, *second_half_poly1,
@@ -412,22 +334,23 @@ void dAC_karatsuba(struct Node *poly1, struct Node *poly2,
   struct Node *sumB0B1 = addPolynomial_nodes(
       first_half_poly2, second_half_poly2, second_half_poly2_tail->exp);
   //
-  dAC_karatsuba(first_half_poly1, first_half_poly2, sum_pos_ref,
-                subtract_pos_ref, sum_gap, subtract_gap + new_k, new_k);
-  dAC_karatsuba(sumA0A1, sumB0B1, sum_pos_ref,
-                subtract_pos_ref, sum_gap + new_k, subtract_gap, new_k);
-  dAC_karatsuba(second_half_poly1, second_half_poly2, sum_pos_ref,
-                subtract_pos_ref, sum_gap + k, subtract_gap + new_k, new_k);
+  int exp = first_half_poly1_tail->exp;
+  struct Node *A0B0, *A1B1, *third, *result;
+  A0B0 = dAC_karatsuba(first_half_poly1, first_half_poly2, exp, new_k, special_k);
+  A1B1 = dAC_karatsuba(second_half_poly1, second_half_poly2, exp, new_k, special_k);
+  third = subtractA0B0_A1B1(dAC_karatsuba(sumA0A1, sumB0B1, exp ,new_k, special_k), A0B0, A1B1);
+
+  result = addPolynomialNodes_karatsuba(A0B0, third, A1B1, k, new_k);
 
   freePolynomial_nodes(sumA0A1);
   freePolynomial_nodes(sumB0B1);
   first_half_poly1_tail->next = second_half_poly1;
   first_half_poly2_tail->next = second_half_poly2;
-  return;
+  return A0B0;
 }
 
 /**
- *  \brief Karatsuba
+ *  \brief Karatsuba.
  */
 struct Polynomial *karatsuba(struct Polynomial *poly1,
                              struct Polynomial *poly2) {
@@ -437,48 +360,10 @@ struct Polynomial *karatsuba(struct Polynomial *poly1,
   result->head = NULL;
   result->tail = NULL;
   result->degree = poly1->degree + poly2->degree;
-  for (int i = result->degree; i >= 0; --i) {
-    push(result, 0, i);
-  }
-  struct Node *sum_pos = result->head;
-  struct Node *subtract_pos = result->head;
 
-  dAC_karatsuba(poly1->head, poly2->head, &sum_pos, &subtract_pos, 0, 0, k);
+  result->head = dAC_karatsuba(poly1->head, poly2->head, poly2->degree, k, 512);
 
   return result;
-}
-
-void test() {
-  int n = 5368299;
-  struct Polynomial *test = generatePolynomial(n);
-
-  double time_spent = 0.0;
-
-  clock_t begin = clock();
-
-  /* struct Polynomial *copy = copyPolynomial(test); */
-
-  clock_t end = clock();
-  /* time_spent += (double)(end - begin) / CLOCKS_PER_SEC; */
-  /* printf("time elapsed is %f seconds\n", time_spent); */
-
-  time_spent = 0.0;
-  begin = clock();
-
-  struct Node *node = test->head;
-  int exp = n - 1;
-  for (int i = 0; i < 1000; ++i) {
-    node = test->head;
-    while (node != NULL && exp > node->exp) {
-      node = node->next;
-    }
-  }
-
-  end = clock();
-  time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("time elapsed is %f seconds\n", time_spent);
-
-  freePolynomial(test);
 }
 
 #endif /* ADVANCEPOLYNOMIALARITHMETICS_H */
