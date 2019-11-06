@@ -1,7 +1,6 @@
-#include "advancePolynomialArithmetics2.h"
+#include "advancePolynomialArithmetics.h"
 #include "basicPolynomialArithmetics.h"
 #include "doublyLinkedListPolynomial.h"
-#include "plot.h"
 #include <stdlib.h>
 
 /* Program used to save timings of methods */

@@ -1,6 +1,6 @@
-/* Laboratory Advance Programming */
-/* Authors: Gabriel Badilla & Rodrigo Kobayashi */
+/* Laboratory 1 - Advance Programming /
 /* Compiler: gcc */
+
 #include "advancePolynomialArithmetics.h"
 #include "basicPolynomialArithmetics.h"
 #include "doublyLinkedListPolynomial.h"
