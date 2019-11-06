@@ -1,10 +1,9 @@
 /* Laboratory Advance Programming */
 /* Authors: Gabriel Badilla & Rodrigo Kobayashi */
 /* Compiler: gcc */
-#include "advancePolynomialArithmetics2.h"
+#include "advancePolynomialArithmetics.h"
 #include "basicPolynomialArithmetics.h"
 #include "doublyLinkedListPolynomial.h"
-#include "plot.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -51,8 +50,7 @@ int main() {
         struct Polynomial *sum = addPolynomials(polynomial, copyPoly);
         printPolynomial(sum);
 
-        freePolynomial(polynomial);
-        freePolynomial(copyPoly);
+        freePolynomial(sum);
         freePolynomial(subtrahend);
       }
       break;
@@ -64,8 +62,11 @@ int main() {
           printf("\n1. Brute Force");
           printf("\n2. Decrease and Conquer");
           printf("\n3. Divide and Conquer");
-          printf("\n4. Decrease-and-Conquer and Divide-and-Conquer");
+          printf("\n4. Karatsuba");
+          printf("\n5. The last three at once");
           printf("\n0. Back");
+          printf("\n\nThose that use the Divide and Conquer method \nonly work "
+                 "for polynomials of degree 2^k -1.");
           printf("\nChoose an option: ");
           scanf("\n%c", &input);
           if (input == '0') {
@@ -86,10 +87,18 @@ int main() {
               printf("\nPolynomial copy:\n");
               printPolynomial(copyPoly);
 
+              double time_spent = 0.0;
+
+              clock_t begin = clock();
+
               printf("\nPolynomial product Brute force:\n");
               struct Polynomial *product =
                   multiplyPolynomials(polynomial, copyPoly);
               printPolynomial(product);
+
+              clock_t end = clock();
+              time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+              printf("time elapsed is %f seconds", time_spent);
 
               freePolynomial(product);
               freePolynomial(polynomial);
@@ -142,18 +151,20 @@ int main() {
               printf("\nPolynomial copy:\n");
               printPolynomial(copyPoly);
 
-              printf("\nPolynomial product Brute force:\n");
+              double time_spent = 0.0;
+
+              clock_t begin = clock();
+
+              printf("\nPolynomial product Divide:\n");
               struct Polynomial *product =
-                  multiplyPolynomials(polynomial, copyPoly);
+                  divideAndConquer(polynomial, copyPoly);
               printPolynomial(product);
 
-              printf("\nPolynomial product Decrease and conquer:\n");
-              struct Polynomial *productDecrease =
-                  decreaseAndConquer(polynomial, copyPoly);
-              printPolynomial(productDecrease);
+              clock_t end = clock();
+              time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+              printf("time elapsed is %f seconds", time_spent);
 
               freePolynomial(product);
-              freePolynomial(productDecrease);
               freePolynomial(polynomial);
               freePolynomial(copyPoly);
             }
@@ -173,17 +184,19 @@ int main() {
               printf("\nPolynomial copy:\n");
               printPolynomial(copyPoly);
 
-              printf("\nPolynomial product Decrease and conquer:\n");
-              struct Polynomial *productDecrease =
-                  decreaseAndConquer(polynomial, copyPoly);
-              printPolynomial(productDecrease);
+              double time_spent = 0.0;
 
-              struct Polynomial *head_poly3 = NULL;
-              head_poly3 = divideAndConquer(polynomial, copyPoly);
-              printPolynomial(head_poly3);
+              clock_t begin = clock();
 
-              freePolynomial(head_poly3);
-              freePolynomial(productDecrease);
+              printf("\nPolynomial product karatsuba:\n");
+              struct Polynomial *product = karatsuba(polynomial, copyPoly);
+              printPolynomial(product);
+
+              clock_t end = clock();
+              time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+              printf("time elapsed is %f seconds", time_spent);
+
+              freePolynomial(product);
               freePolynomial(polynomial);
               freePolynomial(copyPoly);
             }
@@ -191,7 +204,62 @@ int main() {
 
           case '5':
             if (input == '5') {
-              dACTestPlotFile(100, 20000, 100);
+              printf("Enter the degree of the polynomial to generate: ");
+              scanf("%d", &n);
+
+              struct Polynomial *polynomial = generatePolynomial(n);
+              printf("\n##############################################");
+              printf("\nGenerated polynomial:\n");
+              printPolynomial(polynomial);
+
+              struct Polynomial *copyPoly = copyPolynomial(polynomial);
+              printf("\nPolynomial copy:\n");
+              printPolynomial(copyPoly);
+
+              double time_spent = 0.0;
+
+              clock_t begin = clock();
+
+              printf("\nPolynomial product Decrease and Conquer:\n");
+              struct Polynomial *productDecrease =
+                  decreaseAndConquer(polynomial, copyPoly);
+              printPolynomial(productDecrease);
+
+              clock_t end = clock();
+              time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+              printf("time elapsed is %f seconds", time_spent);
+
+              time_spent = 0.0;
+
+              begin = clock();
+
+              printf("\nPolynomial product Divide and Conquer:\n");
+              struct Polynomial *product =
+                  divideAndConquer(polynomial, copyPoly);
+              printPolynomial(product);
+
+              end = clock();
+              time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+              printf("time elapsed is %f seconds", time_spent);
+
+              time_spent = 0.0;
+
+              begin = clock();
+
+              printf("\nPolynomial product karatsuba:\n");
+              struct Polynomial *product_karatsuba =
+                  karatsuba(polynomial, copyPoly);
+              printPolynomial(product);
+
+              end = clock();
+              time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+              printf("time elapsed is %f seconds", time_spent);
+
+              freePolynomial(productDecrease);
+              freePolynomial(product);
+              freePolynomial(product_karatsuba);
+              freePolynomial(polynomial);
+              freePolynomial(copyPoly);
             }
             break;
 
